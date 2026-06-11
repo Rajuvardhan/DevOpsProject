@@ -1,0 +1,43 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+    - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ./backend
+    container_name: backend
+
+    ports:
+      - "3001:3000"
+
+    depends_on:
+      - postgres
+
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ecommerce
+      DB_USER: postgres
+      DB_PASSWORD: password
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+
+    ports:
+      - "4200:80"
+
+    depends_on:
+      - backend
